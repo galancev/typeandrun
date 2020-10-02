@@ -1,45 +1,45 @@
 // tar_math v1.6
-// Copyright © Evgeniy Galantsev 2003-2005
+// Copyright В© Evgeniy Galantsev 2003-2005
 
 library tar_math;
 
 uses
-	Math,
-	SysUtils,
-	IniFiles,
-	Windows,
+  Math,
+  SysUtils,
+  IniFiles,
+  Windows,
   FuncParser in 'FuncParser.pas';
 
 type
-	TInfo=record
-  	size: integer; // Размер структуры
-  	plugin: PChar; // Обязательно строка 'Hello! I am the TypeAndRun plugin.' - это распознание плагина
-		name: PChar; // Название плагина
-		version: PChar; // Его версия
-    description: PChar; // Краткое описание функциональности
-    author: PChar; // Автор плагина
-    copyright: PChar; // Права на плагин
-    homepage: PChar; // Домашняя страница плагина
+  TInfo=record
+    size: integer; // Р Р°Р·РјРµСЂ СЃС‚СЂСѓРєС‚СѓСЂС‹
+    plugin: PChar; // РћР±СЏР·Р°С‚РµР»СЊРЅРѕ СЃС‚СЂРѕРєР° 'Hello! I am the TypeAndRun plugin.' - СЌС‚Рѕ СЂР°СЃРїРѕР·РЅР°РЅРёРµ РїР»Р°РіРёРЅР°
+    name: PChar; // РќР°Р·РІР°РЅРёРµ РїР»Р°РіРёРЅР°
+    version: PChar; // Р•РіРѕ РІРµСЂСЃРёСЏ
+    description: PChar; // РљСЂР°С‚РєРѕРµ РѕРїРёСЃР°РЅРёРµ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕСЃС‚Рё
+    author: PChar; // РђРІС‚РѕСЂ РїР»Р°РіРёРЅР°
+    copyright: PChar; // РџСЂР°РІР° РЅР° РїР»Р°РіРёРЅ
+    homepage: PChar; // Р”РѕРјР°С€РЅСЏСЏ СЃС‚СЂР°РЅРёС†Р° РїР»Р°РіРёРЅР°
   end;
   TExec=record
-  	size: integer; // Размер структуры
-    run: integer; // Возвращает, запустилась ли строка
-    con_text: PChar; // Если надо отобразить текст в консоли
-    con_sel_start: integer; // Начало выделения текста в консоли
-    con_sel_length: integer; // Длина выделения
+    size: integer; // Р Р°Р·РјРµСЂ СЃС‚СЂСѓРєС‚СѓСЂС‹
+    run: integer; // Р’РѕР·РІСЂР°С‰Р°РµС‚, Р·Р°РїСѓСЃС‚РёР»Р°СЃСЊ Р»Рё СЃС‚СЂРѕРєР°
+    con_text: PChar; // Р•СЃР»Рё РЅР°РґРѕ РѕС‚РѕР±СЂР°Р·РёС‚СЊ С‚РµРєСЃС‚ РІ РєРѕРЅСЃРѕР»Рё
+    con_sel_start: integer; // РќР°С‡Р°Р»Рѕ РІС‹РґРµР»РµРЅРёСЏ С‚РµРєСЃС‚Р° РІ РєРѕРЅСЃРѕР»Рё
+    con_sel_length: integer; // Р”Р»РёРЅР° РІС‹РґРµР»РµРЅРёСЏ
   end;
 
 var
-  pf: TParsedFunction; // Класс математического парсера
-  DllFileName: Array[0..MAX_PATH] of Char; // Путь к dll'шке - нужен для определения папки, где хранить настройки
-  SelectAnswer: boolean; // Выделять ли ответ в консоли
-  CopyToClipboard: boolean; // Копировать ли ответ в буфер обмена
-  UseEqual: boolean; // Использовать ли символ = для распознания выражения
-	UseOriginal: boolean; // Использовать ли оригинальное выражение в ответе
-	Round: boolean; // Округлять ли ответ
-	RoundLimit: integer; // Округлять - сколько знаков после запятой
+  pf: TParsedFunction; // РљР»Р°СЃСЃ РјР°С‚РµРјР°С‚РёС‡РµСЃРєРѕРіРѕ РїР°СЂСЃРµСЂР°
+  DllFileName: Array[0..MAX_PATH] of Char; // РџСѓС‚СЊ Рє dll'С€РєРµ - РЅСѓР¶РµРЅ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РїР°РїРєРё, РіРґРµ С…СЂР°РЅРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё
+  SelectAnswer: boolean; // Р’С‹РґРµР»СЏС‚СЊ Р»Рё РѕС‚РІРµС‚ РІ РєРѕРЅСЃРѕР»Рё
+  CopyToClipboard: boolean; // РљРѕРїРёСЂРѕРІР°С‚СЊ Р»Рё РѕС‚РІРµС‚ РІ Р±СѓС„РµСЂ РѕР±РјРµРЅР°
+  UseEqual: boolean; // РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р»Рё СЃРёРјРІРѕР» = РґР»СЏ СЂР°СЃРїРѕР·РЅР°РЅРёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ
+  UseOriginal: boolean; // РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р»Рё РѕСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ РІ РѕС‚РІРµС‚Рµ
+  Round: boolean; // РћРєСЂСѓРіР»СЏС‚СЊ Р»Рё РѕС‚РІРµС‚
+  RoundLimit: integer; // РћРєСЂСѓРіР»СЏС‚СЊ - СЃРєРѕР»СЊРєРѕ Р·РЅР°РєРѕРІ РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№
 
-// Кидает текст в буфер обмена
+// РљРёРґР°РµС‚ С‚РµРєСЃС‚ РІ Р±СѓС„РµСЂ РѕР±РјРµРЅР°
 procedure SetClipboard(Buffer: PChar);
 var
   Data: THandle;
@@ -70,7 +70,7 @@ begin
   end;
 end;
 
-// Загружает настройки из инишки
+// Р—Р°РіСЂСѓР¶Р°РµС‚ РЅР°СЃС‚СЂРѕР№РєРё РёР· РёРЅРёС€РєРё
 procedure LoadSettings;
 var
   IniFile: TMemIniFile;
@@ -79,15 +79,15 @@ begin
   SelectAnswer:=IniFile.ReadBool('General', 'SelectAnswer', True);
   CopyToClipboard:=IniFile.ReadBool('General', 'CopyToClipboard', True);
   UseEqual:=IniFile.ReadBool('General', 'UseEqual', True);
-	UseOriginal:=IniFile.ReadBool('General', 'UseOriginal', True);
-	Round:=IniFile.ReadBool('General', 'Round', True);
-	RoundLimit:=IniFile.ReadInteger('General', 'RoundLimit', 13);
-	if (RoundLimit<0) or (RoundLimit>13) then
-		RoundLimit:=13;  
+  UseOriginal:=IniFile.ReadBool('General', 'UseOriginal', True);
+  Round:=IniFile.ReadBool('General', 'Round', True);
+  RoundLimit:=IniFile.ReadInteger('General', 'RoundLimit', 13);
+  if (RoundLimit<0) or (RoundLimit>13) then
+    RoundLimit:=13;  
   IniFile.Destroy;
 end;
 
-// Сохраняет настройки в инишке
+// РЎРѕС…СЂР°РЅСЏРµС‚ РЅР°СЃС‚СЂРѕР№РєРё РІ РёРЅРёС€РєРµ
 procedure SaveSettings;
 var
   IniFile: TMemIniFile;
@@ -96,116 +96,116 @@ begin
   IniFile.WriteBool('General', 'SelectAnswer', SelectAnswer);
   IniFile.WriteBool('General', 'CopyToClipboard', CopyToClipboard);
   IniFile.WriteBool('General', 'UseEqual', UseEqual);
-	IniFile.WriteBool('General', 'UseOriginal', UseOriginal);
-	IniFile.WriteBool('General', 'Round', Round);
-	IniFile.WriteInteger('General', 'RoundLimit', RoundLimit);
+  IniFile.WriteBool('General', 'UseOriginal', UseOriginal);
+  IniFile.WriteBool('General', 'Round', Round);
+  IniFile.WriteInteger('General', 'RoundLimit', RoundLimit);
   IniFile.UpdateFile;
   IniFile.Destroy;
 end;
 
-// Выполняется при загрузке dll
-// WinHWND - хендл главного окна
+// Р’С‹РїРѕР»РЅСЏРµС‚СЃСЏ РїСЂРё Р·Р°РіСЂСѓР·РєРµ dll
+// WinHWND - С…РµРЅРґР» РіР»Р°РІРЅРѕРіРѕ РѕРєРЅР°
 procedure Load(WinHWND: HWND); cdecl;
 begin
-  GetModuleFileName(HInstance, DllFileName, MAX_PATH); // Вычисляем полный путь к tar_math.dll
+  GetModuleFileName(HInstance, DllFileName, MAX_PATH); // Р’С‹С‡РёСЃР»СЏРµРј РїРѕР»РЅС‹Р№ РїСѓС‚СЊ Рє tar_math.dll
   pf:=TParsedFunction.create;
-	LoadSettings; // Загружаем настройки
+  LoadSettings; // Р—Р°РіСЂСѓР¶Р°РµРј РЅР°СЃС‚СЂРѕР№РєРё
 end;
 exports Load;
 
-// Выполняется при выгрузке dll
+// Р’С‹РїРѕР»РЅСЏРµС‚СЃСЏ РїСЂРё РІС‹РіСЂСѓР·РєРµ dll
 procedure Unload; cdecl;
 begin
   pf.Destroy;
-	//SaveSettings; // Сохранение настроек
+  //SaveSettings; // РЎРѕС…СЂР°РЅРµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє
 end;
 exports Unload;
 
-// Проверка при принадледность dll к плагинам TypeAndRun
-// И возврат информации о плагине
+// РџСЂРѕРІРµСЂРєР° РїСЂРё РїСЂРёРЅР°РґР»РµРґРЅРѕСЃС‚СЊ dll Рє РїР»Р°РіРёРЅР°Рј TypeAndRun
+// Р РІРѕР·РІСЂР°С‚ РёРЅС„РѕСЂРјР°С†РёРё Рѕ РїР»Р°РіРёРЅРµ
 function GetInfo: TInfo; cdecl;
 var
-	info: TInfo;
+  info: TInfo;
 begin
-	info.size:=SizeOf(TInfo);
-	info.plugin:='Hello! I am the TypeAndRun plugin.';
-	info.name:='tar_math';
+  info.size:=SizeOf(TInfo);
+  info.plugin:='Hello! I am the TypeAndRun plugin.';
+  info.name:='tar_math';
   info.version:='1.6';
   info.description:='Console calculator plugin';
   info.author:='Evgeniy Galantsev (-=GaLaN=-)';
-	info.copyright:='Copyright © Evgeniy Galantsev 2003-2005';
+  info.copyright:='Copyright В© Evgeniy Galantsev 2003-2005';
   info.homepage:='http://galanc.com/';
-	Result:=info;
+  Result:=info;
 end;
 exports GetInfo;
 
-// Запуск строки с помощью плагина - возвращает, прошел ли запуск и строку, отображаемую в консоли
-// str - запускаемая строка
+// Р—Р°РїСѓСЃРє СЃС‚СЂРѕРєРё СЃ РїРѕРјРѕС‰СЊСЋ РїР»Р°РіРёРЅР° - РІРѕР·РІСЂР°С‰Р°РµС‚, РїСЂРѕС€РµР» Р»Рё Р·Р°РїСѓСЃРє Рё СЃС‚СЂРѕРєСѓ, РѕС‚РѕР±СЂР°Р¶Р°РµРјСѓСЋ РІ РєРѕРЅСЃРѕР»Рё
+// str - Р·Р°РїСѓСЃРєР°РµРјР°СЏ СЃС‚СЂРѕРєР°
 function RunString(str: PChar): TExec; cdecl;
 var
-	exec: TExec;
-	tmpStr, AnswerText: string;
-	ec: byte;
+  exec: TExec;
+  tmpStr, AnswerText: string;
+  ec: byte;
 begin
-	// Инициализация возвращаемой структуры
-	exec.size:=SizeOf(TExec);
-	exec.run:=0;
-	exec.con_text:='';
-	exec.con_sel_start:=0;
-	exec.con_sel_length:=0;
-	tmpStr:=str;
-	// Если строка оканчивается на '=', то парсим
-	if (Copy(tmpStr, Length(tmpStr), 1)='=') and UseEqual then
-		tmpStr:=Copy(tmpStr, 0, Length(tmpStr)-1)
-	else if UseEqual then
-		exit;
-	pf.ParseFunction(tmpStr, ec);
-	// Если калькулятор сработал правильно
-	if ec=0 then begin
-		exec.run:=2;
-		if Round then begin
-			AnswerText:=FloatToStr(RoundTo(pf.Compute(0, 0, 0), -RoundLimit));
-		end
-		else begin
-			AnswerText:=FloatToStr(pf.Compute(0, 0, 0));
-		end;
-		AnswerText:=Trim(AnswerText);
-		while pos(',', AnswerText)<>0 do begin
-			Insert('.', AnswerText, pos(',', AnswerText));
-			Delete(AnswerText, pos(',', AnswerText), 1);
-		end;
-		if UseOriginal then begin
-			if UseEqual then
-				tmpStr:=tmpStr+'='+AnswerText
-			else
-				tmpStr:=tmpStr+AnswerText;
-		end
-		else
-			tmpStr:=AnswerText;
-		//exec.con_text:=PChar(tmpStr+'='+AnswerText);
-		exec.con_text:=PChar(tmpStr);
-		// В зависимости от настройки выделяем текст или нет
+  // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІРѕР·РІСЂР°С‰Р°РµРјРѕР№ СЃС‚СЂСѓРєС‚СѓСЂС‹
+  exec.size:=SizeOf(TExec);
+  exec.run:=0;
+  exec.con_text:='';
+  exec.con_sel_start:=0;
+  exec.con_sel_length:=0;
+  tmpStr:=str;
+  // Р•СЃР»Рё СЃС‚СЂРѕРєР° РѕРєР°РЅС‡РёРІР°РµС‚СЃСЏ РЅР° '=', С‚Рѕ РїР°СЂСЃРёРј
+  if (Copy(tmpStr, Length(tmpStr), 1)='=') and UseEqual then
+    tmpStr:=Copy(tmpStr, 0, Length(tmpStr)-1)
+  else if UseEqual then
+    exit;
+  pf.ParseFunction(tmpStr, ec);
+  // Р•СЃР»Рё РєР°Р»СЊРєСѓР»СЏС‚РѕСЂ СЃСЂР°Р±РѕС‚Р°Р» РїСЂР°РІРёР»СЊРЅРѕ
+  if ec=0 then begin
+    exec.run:=2;
+    if Round then begin
+      AnswerText:=FloatToStr(RoundTo(pf.Compute(0, 0, 0), -RoundLimit));
+    end
+    else begin
+      AnswerText:=FloatToStr(pf.Compute(0, 0, 0));
+    end;
+    AnswerText:=Trim(AnswerText);
+    while pos(',', AnswerText)<>0 do begin
+      Insert('.', AnswerText, pos(',', AnswerText));
+      Delete(AnswerText, pos(',', AnswerText), 1);
+    end;
+    if UseOriginal then begin
+      if UseEqual then
+        tmpStr:=tmpStr+'='+AnswerText
+      else
+        tmpStr:=tmpStr+AnswerText;
+    end
+    else
+      tmpStr:=AnswerText;
+    //exec.con_text:=PChar(tmpStr+'='+AnswerText);
+    exec.con_text:=PChar(tmpStr);
+    // Р’ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РЅР°СЃС‚СЂРѕР№РєРё РІС‹РґРµР»СЏРµРј С‚РµРєСЃС‚ РёР»Рё РЅРµС‚
     if SelectAnswer then begin
-    	if UseOriginal then begin
-	      exec.con_sel_start:=Length(str);
-	      exec.con_sel_length:=Length(AnswerText);
+      if UseOriginal then begin
+        exec.con_sel_start:=Length(str);
+        exec.con_sel_length:=Length(AnswerText);
       end
       else begin
-				exec.con_sel_start:=0;
-	      exec.con_sel_length:=Length(AnswerText);
+        exec.con_sel_start:=0;
+        exec.con_sel_length:=Length(AnswerText);
       end;
     end
     else begin
-    	if UseOriginal then begin
-	    	exec.con_sel_start:=Length(str);
-	      exec.con_sel_length:=0;
-			end;
+      if UseOriginal then begin
+        exec.con_sel_start:=Length(str);
+        exec.con_sel_length:=0;
+      end;
     end;
-    // Если разрешено, то копируем строку в буфер обмена
+    // Р•СЃР»Рё СЂР°Р·СЂРµС€РµРЅРѕ, С‚Рѕ РєРѕРїРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ РІ Р±СѓС„РµСЂ РѕР±РјРµРЅР°
     if CopyToClipboard then
       SetClipboard(PChar(AnswerText));
   end;
-	Result:=exec;
+  Result:=exec;
 end;
 exports RunString;
 
