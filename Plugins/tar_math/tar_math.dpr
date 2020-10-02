@@ -121,7 +121,7 @@ begin
 end;
 exports Unload;
 
-// Проверка при принадледность dll к плагинам TypeAndRun
+// Проверка на принадлежность dll к плагинам TypeAndRun
 // И возврат информации о плагине
 function GetInfo: TInfo; cdecl;
 var
